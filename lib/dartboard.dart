@@ -1,11 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 import 'dart:io';
+import 'dart:mirrors';
 
 import 'package:collection/collection.dart';
+import 'package:dartboard/http_types.dart';
 
-import 'package:dartboard/models/verb.dart';
 import 'package:dartboard/services/parse_path.dart';
+import 'package:dartboard/services/print_routes.dart';
 
 class DartBoard {
   late final Router router;
@@ -20,14 +22,14 @@ class DartBoard {
     server = HttpServer.bind(address, port);
   }
 
-  void route(Method method, String path, {Handler? handler, List<Handler>? handlers}) =>
+  void route(HttpMethod method, String path, {Handler? handler, List<Handler>? handlers}) =>
       router.route(method, path, handler: handler);
 
   void runHTTP() async {
     print('Running HTTP server on: http://$address:$port');
     final s = await server;
-    final routes = _normalizeRouter(router);
-    print("N of routes: " + routes.length.toString());
+    final routes = router.normalize();
+    printRoutes(routes);
     await for (HttpRequest request in s) {
       bool hasMatch = false;
       Context context = Context(response: request.response, request: request);
@@ -49,7 +51,7 @@ class DartBoard {
   }
 
   void default404Handler(Context c) {
-    c.json(Status.Notfound, 'Page ${c.request.uri.path} not found');
+    c.json(HttpStatus.notFound, 'Page ${c.request.uri.path} not found');
   }
 
   bool pathMatch(Route route, List<String> request) {
@@ -69,18 +71,6 @@ class DartBoard {
     }
     return true;
   }
-
-  List<Route> _normalizeRouter(Router r) {
-    List<Route> routes = [];
-    // final String basePath = r.basePath;
-    for (Route route in r.routes) {
-      routes.add(route);
-    }
-    for (Router group in r.groups) {
-      routes.addAll(_normalizeRouter(group));
-    }
-    return routes;
-  }
 }
 
 class Router {
@@ -93,7 +83,21 @@ class Router {
     required this.groups,
   });
 
-  void route(Method v, String path, {Handler? handler}) {
+  List<Route> normalize() {
+    List<Route> temp = [];
+    // final String basePath = r.basePath;
+    for (Route route in routes) {
+      temp.add(route);
+    }
+    for (Router group in groups) {
+      temp.addAll(group.normalize());
+    }
+    routes = [];
+    groups = [];
+    return temp;
+  }
+
+  void route(HttpMethod v, String path, {Handler? handler}) {
     if (handler == null) {
       throw 'Error in handlers definition';
     }
@@ -102,7 +106,7 @@ class Router {
     //   throw 'field "handler" and "handlers" are both initialized';
     // }
     List<String> segments = [basePath];
-    for (final String s in path.split('/').where((element) => element.trim().isNotEmpty)) {
+    for (final String s in parsePath(path)) {
       segments.add(s);
     }
     routes.add(Route(method: v, path: segments.join('/'), handler: handler));
@@ -110,7 +114,7 @@ class Router {
 }
 
 class Route {
-  final Method method;
+  final HttpMethod method;
   final String path;
   late final List<String> pathSegments;
   final Handler handler;
@@ -123,7 +127,7 @@ class Route {
   }
 
   Route copyWith({
-    Method? method,
+    HttpMethod? method,
     String? path,
     String? pathSegments,
     Handler? handler,
@@ -146,7 +150,7 @@ class Context {
     this.keys = const {},
   });
   void json(int s, String data) {
-    response.statusCode = HttpStatus.notFound;
+    response.statusCode = s;
     response.write(data);
   }
 }

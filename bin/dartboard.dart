@@ -1,24 +1,22 @@
 import 'dart:io';
 
 import 'package:dartboard/dartboard.dart';
-import 'package:dartboard/models/verb.dart';
+import 'package:dartboard/http_types.dart';
 
 void main(List<String> arguments) {
-  // final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 3030);
-  // await for (HttpRequest request in server) {
-  //   request.response.write('Hello from a Dart server');
-  //   await request.response.close();
-  // }
-
-  final app = DartBoard(port: 4444);
-  app.route(Method.GET, '/', handler: (Context c) => c.json(200, 'pong'));
-  app.route(Method.GET, '/hello', handler: (Context c) {
+  final app = DartBoard(port: 5555);
+  app.route(HttpMethod.GET, '/', handler: rootFunction);
+  app.route(HttpMethod.GET, '/hello', handler: (Context c) {
     print('Hello!');
-    c.json(Status.OK, "Hello");
+    c.json(HttpStatus.ok, "Hello");
   });
-  app.route(Method.GET, '/world', handler: (Context c) {
+  app.route(HttpMethod.GET, '/world', handler: (Context c) {
     print('world!');
-    c.json(Status.OK, "world!");
+    c.json(HttpStatus.ok, "world!");
   });
   app.runHTTP();
 }
+
+final rootFunction = (Context c) {
+  return c.json(HttpStatus.ok, 'pong');
+};
