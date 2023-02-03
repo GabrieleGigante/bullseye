@@ -18,6 +18,9 @@ include: package:lints/recommended.yaml
 # linter:
 #   rules:
 #     - camel_case_types
+analyzer:
+  enable-experiment:
+    - records
 
 # analyzer:
 #   exclude:

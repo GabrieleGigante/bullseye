@@ -1,13 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 import 'dart:io';
-import 'dart:mirrors';
 
-import 'package:collection/collection.dart';
-import 'package:dartboard/http_types.dart';
-
+import 'package:dartboard/models/http_types.dart';
+import 'package:dartboard/router.dart';
 import 'package:dartboard/services/parse_path.dart';
 import 'package:dartboard/services/print_routes.dart';
+
+import 'context.dart';
+import 'route.dart';
 
 class DartBoard {
   late final Router router;
@@ -22,8 +22,21 @@ class DartBoard {
     server = HttpServer.bind(address, port);
   }
 
-  void route(HttpMethod method, String path, {Handler? handler, List<Handler>? handlers}) =>
+  void get(final String path, {final Handler? handler}) => router.get(path, handler: handler);
+  void post(final String path, {final Handler? handler}) => router.post(path, handler: handler);
+  void patch(final String path, {final Handler? handler}) => router.patch(path, handler: handler);
+  void put(final String path, {final Handler? handler}) => router.put(path, handler: handler);
+  void delete(final String path, {final Handler? handler}) => router.delete(path, handler: handler);
+  void options(final String path, {final Handler? handler}) =>
+      router.options(path, handler: handler);
+  void route(final String method, final String path, {final Handler? handler}) =>
       router.route(method, path, handler: handler);
+  void use(Handler middleware) => router.route('*', '*', handler: middleware);
+
+  Router group(final String path) {
+    final r = Router(routes: [], groups: []);
+    return r;
+  }
 
   void runHTTP() async {
     print('Running HTTP server on: http://$address:$port');
@@ -31,22 +44,23 @@ class DartBoard {
     final routes = router.normalize();
     printRoutes(routes);
     await for (HttpRequest request in s) {
-      bool hasMatch = false;
-      Context context = Context(response: request.response, request: request);
+      Context context = Context(
+          response: request.response, request: request, urlParam: {}, queryParam: {}, keys: {});
       for (Route route in routes) {
-        if (route.method.name != request.method) {
+        if (route.method != request.method && route.method != '*') {
           continue;
         }
         final requestPath = parsePath(request.uri.path);
-        if (pathMatch(route, requestPath)) {
-          hasMatch = true;
-          route.handler(context);
+        if (pathMatch(route, requestPath, context)) {
+          context.handlers.add(route.handler);
         }
       }
-      if (!hasMatch) {
+      if (context.handlers.isEmpty) {
         default404Handler(context);
+      } else {
+        context.start();
       }
-      await request.response.close();
+      await context.end();
     }
   }
 
@@ -54,14 +68,21 @@ class DartBoard {
     c.json(HttpStatus.notFound, 'Page ${c.request.uri.path} not found');
   }
 
-  bool pathMatch(Route route, List<String> request) {
-    if (request.length != route.pathSegments.length) {
+  bool pathMatch(Route route, List<String> request, Context c) {
+    if (request.length != route.pathSegments.length && route.method != '*') {
       return false;
+    }
+    if (route.path == '*' || route.path == '/*') {
+      return true;
     }
     for (var i = 0; i < route.pathSegments.length; i++) {
       final routeSegment = route.pathSegments[i];
-      final reqSegment = request[i];
-      if (routeSegment.startsWith(':')) {
+      String reqSegment = '';
+      if (i < request.length) {
+        reqSegment = request[i];
+      }
+      if (routeSegment.startsWith(':') || routeSegment.startsWith('*')) {
+        c.urlParam[routeSegment.substring(1)] = reqSegment;
         continue;
       }
       if (routeSegment == reqSegment) {
@@ -70,87 +91,5 @@ class DartBoard {
       return false;
     }
     return true;
-  }
-}
-
-class Router {
-  String basePath = '';
-  List<Route> routes;
-  List<Router> groups;
-  Router({
-    this.basePath = '',
-    required this.routes,
-    required this.groups,
-  });
-
-  List<Route> normalize() {
-    List<Route> temp = [];
-    // final String basePath = r.basePath;
-    for (Route route in routes) {
-      temp.add(route);
-    }
-    for (Router group in groups) {
-      temp.addAll(group.normalize());
-    }
-    routes = [];
-    groups = [];
-    return temp;
-  }
-
-  void route(HttpMethod v, String path, {Handler? handler}) {
-    if (handler == null) {
-      throw 'Error in handlers definition';
-    }
-    // ignore: unnecessary_null_comparison
-    // if (handler != null) {
-    //   throw 'field "handler" and "handlers" are both initialized';
-    // }
-    List<String> segments = [basePath];
-    for (final String s in parsePath(path)) {
-      segments.add(s);
-    }
-    routes.add(Route(method: v, path: segments.join('/'), handler: handler));
-  }
-}
-
-class Route {
-  final HttpMethod method;
-  final String path;
-  late final List<String> pathSegments;
-  final Handler handler;
-  Route({
-    required this.method,
-    required this.path,
-    required this.handler,
-  }) {
-    pathSegments = parsePath(path);
-  }
-
-  Route copyWith({
-    HttpMethod? method,
-    String? path,
-    String? pathSegments,
-    Handler? handler,
-  }) {
-    return Route(
-      method: method ?? this.method,
-      path: path ?? this.path,
-      handler: handler ?? this.handler,
-    );
-  }
-}
-
-class Context {
-  HttpResponse response;
-  HttpRequest request;
-  Map<String, dynamic> keys;
-  Context({
-    required this.response,
-    required this.request,
-    this.keys = const {},
-  });
-  void json(int s, String data) {
-    response.statusCode = s;
-    response.write(data);
   }
 }

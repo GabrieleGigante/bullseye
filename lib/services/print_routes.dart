@@ -2,11 +2,11 @@ import 'dart:mirrors';
 
 import 'package:dolumns/dolumns.dart';
 
-import '../dartboard.dart';
+import '../route.dart';
 
 void printRoutes(List<Route> routes) {
   List<List<String>> d = [];
-  print('Number of endpoints: ${routes.length}');
+  print('Number of handlers: ${routes.length}');
   for (Route r in routes) {
     final cm = reflect(r.handler) as ClosureMirror;
     final fn = MirrorSystem.getName(cm.function.qualifiedName)
@@ -16,7 +16,10 @@ void printRoutes(List<Route> routes) {
     if (pn.isEmpty) {
       pn = '/';
     }
-    d.add([r.method.name, '-', pn, '-->', fn]);
+    if (r.method == '*') {
+      continue;
+    }
+    d.add([r.method, '-', pn, '-->', fn]);
   }
   print(dolumnify(d));
 }
