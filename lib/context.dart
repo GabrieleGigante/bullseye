@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dartboard/models/http_types.dart';
@@ -18,7 +19,17 @@ class Context {
     required this.keys,
   });
 
-  void json(int s, String data) async {
+  void json(int s, dynamic data) async {
+    response.statusCode = s;
+    try {
+      response.write(data.toJson());
+    } catch (_) {
+      response.write(jsonEncode(data));
+    }
+    await end();
+  }
+
+  void send(int s, String data) async {
     response.statusCode = s;
     response.write(data);
     await end();

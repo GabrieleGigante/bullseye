@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dartboard/models/http_types.dart';
 import 'package:dartboard/router.dart';
 import 'package:dartboard/services/parse_path.dart';
-import 'package:dartboard/services/print_routes.dart';
+// import 'package:dartboard/services/print_routes.dart';
 
 import 'context.dart';
 import 'route.dart';
@@ -16,33 +16,39 @@ class DartBoard {
   late final Future<HttpServer> server;
   DartBoard({this.address = '0.0.0.0', required this.port}) {
     if (port.isNegative) {
-      throw 'Negative ports are not allowed';
+      throw 'You can\'t listen on a negative port';
     }
     router = Router(routes: [], groups: []);
     server = HttpServer.bind(address, port);
   }
 
-  void get(final String path, {final Handler? handler}) => router.get(path, handler: handler);
-  void post(final String path, {final Handler? handler}) => router.post(path, handler: handler);
-  void patch(final String path, {final Handler? handler}) => router.patch(path, handler: handler);
-  void put(final String path, {final Handler? handler}) => router.put(path, handler: handler);
-  void delete(final String path, {final Handler? handler}) => router.delete(path, handler: handler);
+  void get(final String path, {final Handler? handler}) =>
+      router.route(HttpMethod.GET, path, handler: handler);
+  void post(final String path, {final Handler? handler}) =>
+      router.route(HttpMethod.POST, path, handler: handler);
+  void patch(final String path, {final Handler? handler}) =>
+      router.route(HttpMethod.PATCH, path, handler: handler);
+  void put(final String path, {final Handler? handler}) =>
+      router.route(HttpMethod.PUT, path, handler: handler);
+  void delete(final String path, {final Handler? handler}) =>
+      router.route(HttpMethod.DELETE, path, handler: handler);
   void options(final String path, {final Handler? handler}) =>
-      router.options(path, handler: handler);
+      router.route(HttpMethod.OPTIONS, path, handler: handler);
   void route(final String method, final String path, {final Handler? handler}) =>
       router.route(method, path, handler: handler);
   void use(Handler middleware) => router.route('*', '*', handler: middleware);
 
   Router group(final String path) {
-    final r = Router(routes: [], groups: []);
+    final r = Router(routes: [], groups: [], basePath: path);
+    router.groups.add(r);
     return r;
   }
 
-  void runHTTP() async {
+  void listen() async {
     print('Running HTTP server on: http://$address:$port');
     final s = await server;
     final routes = router.normalize();
-    printRoutes(routes);
+    // printRoutes(routes);
     await for (HttpRequest request in s) {
       Context context = Context(
           response: request.response, request: request, urlParam: {}, queryParam: {}, keys: {});

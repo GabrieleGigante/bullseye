@@ -1,7 +1,5 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
-import 'package:dartboard/dartboard.dart';
-
 import '../context.dart';
 
 class HttpMethod {
@@ -13,6 +11,6 @@ class HttpMethod {
   static String OPTIONS = 'OPTIONS';
 }
 
-typedef Handler = Function(Context);
-
-// typedef Middleware = Handler Function();
+typedef Handler = void Function(Context);
+typedef HandlerList = List<Handler>;
+typedef Middleware = Handler Function(String);

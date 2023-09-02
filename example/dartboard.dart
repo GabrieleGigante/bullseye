@@ -4,27 +4,31 @@ import 'package:dartboard/context.dart';
 import 'package:dartboard/dartboard.dart';
 import 'package:dartboard/models/http_types.dart';
 
-exampleMiddleware(String name) {
+Middleware exampleMiddleware = (String name) {
   return (Context c) {
     // print('middleware $name');
     c.response.headers.set('middleware-$name', 'done');
   };
-}
-
-// ignore: prefer_function_declarations_over_variables
-final rootFunction = (Context c) {
-  print('pong');
-  return c.json(HttpStatus.ok, 'pong');
 };
+
+final rootFunction = (Context c) {
+  // print('pong');
+  c.send(HttpStatus.ok, 'pong');
+  return;
+};
+
+class ExampleController {
+  void index(Context c) {
+    c.send(HttpStatus.ok, 'index');
+  }
+
+  void show(Context c) {
+    c.send(HttpStatus.ok, 'show');
+  }
+}
 
 void main(List<String> arguments) {
   final app = DartBoard(port: 5555);
-  app.use(exampleMiddleware('1'));
-  app.route(HttpMethod.GET, '/', handler: rootFunction);
-  app.use(exampleMiddleware('2'));
-  app.route(HttpMethod.GET, '/hello', handler: (Context c) {
-    print('Hello!');
-    c.json(HttpStatus.ok, "Hello");
-  });
-  app.runHTTP();
+  app.route(HttpMethod.GET, '/', handler: ExampleController().index);
+  app.listen();
 }

@@ -15,7 +15,6 @@ class Router {
 
   List<Route> normalize() {
     List<Route> temp = [];
-    // final String basePath = r.basePath;
     for (Route route in routes) {
       temp.add(route);
     }
@@ -41,16 +40,12 @@ class Router {
       route(HttpMethod.OPTIONS, path, handler: handler);
 
   void route(final String v, final String path, {final Handler? handler}) {
-    if (handler == null) {
-      throw 'Error in handlers definition';
-    }
-    // ignore: unnecessary_null_comparison
-    // if (handler != null) {
-    //   throw 'field "handler" and "handlers" are both initialized';
-    // }
-    List<String> segments = [basePath];
-    for (final String s in parsePath(path)) {
+    List<String> segments = [];
+    for (final String s in parsePath('$basePath/$path')) {
       segments.add(s);
+    }
+    if (handler == null) {
+      throw 'Handler is required';
     }
     routes.add(Route(method: v, path: segments.join('/'), handler: handler));
   }

@@ -1,1 +1,0 @@
-Check the "example" repository for examples
