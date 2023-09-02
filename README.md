@@ -16,10 +16,10 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">bullseye</h3>
+<h3 align="center">Bullseye</h3>
 
   <p align="center">
-    bullseye is a Gin inspired web framework for Dart.
+    Bullseye is a Gin inspired web framework for Dart.
     <br />
     <a href="https://github.com/GabrieleGigante/bullseye/tree/main/docs"><strong>Explore the docs »</strong></a>
     <br />
