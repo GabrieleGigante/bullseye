@@ -1,4 +1,4 @@
-import 'package:dartboard/services/parse_path.dart';
+import 'package:bullseye/services/parse_path.dart';
 
 import 'models/http_types.dart';
 

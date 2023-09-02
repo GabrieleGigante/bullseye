@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "dartboard",
+            "name": "bullseye",
             "request": "launch",
             "type": "dart",
-            "program": "example/dartboard.dart",
+            "program": "examples/bullseye.dart",
         }
     ]
 }

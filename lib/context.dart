@@ -1,25 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dartboard/models/http_types.dart';
+import 'package:bullseye/models/http_types.dart';
 
 class Context {
   HttpResponse response;
   HttpRequest request;
   int handlerIndex = 0;
   List<Handler> handlers = [];
-  Map<String, String> urlParam;
+  Map<String, String> pathParam;
   Map<String, String> queryParam;
   Map<String, dynamic> keys;
   Context({
     required this.response,
     required this.request,
-    required this.urlParam,
+    required this.pathParam,
     required this.queryParam,
     required this.keys,
   });
 
   void json(int s, dynamic data) async {
+    response.headers.contentType = ContentType.json;
     response.statusCode = s;
     try {
       response.write(data.toJson());
@@ -35,15 +36,16 @@ class Context {
     await end();
   }
 
-  String param(String key) {
-    return urlParam[key] ?? '';
+  String pathParameter(String key) {
+    return pathParam[key] ?? '';
   }
 
-  String query(String key) {
+  String queryParameter(String key) {
     return queryParam[key] ?? '';
   }
 
   void start() {
+    response.headers.add('x-powered-by', 'bullseye');
     while (handlerIndex < handlers.length) {
       handlers[handlerIndex](this);
       handlerIndex++;

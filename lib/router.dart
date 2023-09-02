@@ -1,5 +1,5 @@
-import 'package:dartboard/route.dart';
-import 'package:dartboard/services/parse_path.dart';
+import 'package:bullseye/route.dart';
+import 'package:bullseye/services/parse_path.dart';
 
 import 'models/http_types.dart';
 

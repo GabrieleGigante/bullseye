@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:dartboard/context.dart';
-import 'package:dartboard/dartboard.dart';
-import 'package:dartboard/models/http_types.dart';
+import 'package:bullseye/bullseye.dart';
+import 'package:bullseye/context.dart';
+import 'package:bullseye/models/http_types.dart';
 
 Middleware exampleMiddleware = (String name) {
   return (Context c) {
@@ -11,11 +11,7 @@ Middleware exampleMiddleware = (String name) {
   };
 };
 
-final rootFunction = (Context c) {
-  // print('pong');
-  c.send(HttpStatus.ok, 'pong');
-  return;
-};
+void rootFunction(Context c) => c.json(HttpStatus.ok, {'Hello': 'world'});
 
 class ExampleController {
   void index(Context c) {
@@ -28,7 +24,8 @@ class ExampleController {
 }
 
 void main(List<String> arguments) {
-  final app = DartBoard(port: 5555);
-  app.route(HttpMethod.GET, '/', handler: ExampleController().index);
+  final app = Bullseye(port: 5555);
+  app.use(exampleMiddleware('1'));
+  app.route(HttpMethod.GET, '/', handler: rootFunction);
   app.listen();
 }

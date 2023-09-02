@@ -1,20 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
-import 'package:dartboard/models/http_types.dart';
-import 'package:dartboard/router.dart';
-import 'package:dartboard/services/parse_path.dart';
-// import 'package:dartboard/services/print_routes.dart';
+import 'package:bullseye/models/http_types.dart';
+import 'package:bullseye/router.dart';
+import 'package:bullseye/services/parse_path.dart';
+// import 'package:bullseye/services/print_routes.dart';
 
 import 'context.dart';
 import 'route.dart';
 
-class DartBoard {
+class Bullseye {
   late final Router router;
   final String address;
   final int port;
   late final Future<HttpServer> server;
-  DartBoard({this.address = '0.0.0.0', required this.port}) {
+  Bullseye({this.address = '0.0.0.0', required this.port}) {
     if (port.isNegative) {
       throw 'You can\'t listen on a negative port';
     }
@@ -51,7 +51,12 @@ class DartBoard {
     // printRoutes(routes);
     await for (HttpRequest request in s) {
       Context context = Context(
-          response: request.response, request: request, urlParam: {}, queryParam: {}, keys: {});
+        response: request.response,
+        request: request,
+        pathParam: {},
+        queryParam: {},
+        keys: {},
+      );
       for (Route route in routes) {
         if (route.method != request.method && route.method != '*') {
           continue;
@@ -88,7 +93,7 @@ class DartBoard {
         reqSegment = request[i];
       }
       if (routeSegment.startsWith(':') || routeSegment.startsWith('*')) {
-        c.urlParam[routeSegment.substring(1)] = reqSegment;
+        c.pathParam[routeSegment.substring(1)] = reqSegment;
         continue;
       }
       if (routeSegment == reqSegment) {
