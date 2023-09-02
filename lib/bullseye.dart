@@ -1,13 +1,17 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
-import 'package:bullseye/models/http_types.dart';
-import 'package:bullseye/router.dart';
 import 'package:bullseye/services/parse_path.dart';
-// import 'package:bullseye/services/print_routes.dart';
 
 import 'context.dart';
+import 'models/http_types.dart';
 import 'route.dart';
+import 'router.dart';
+
+export 'dart:io';
+export 'context.dart';
+export 'models/http_types.dart';
+export 'route.dart';
+export 'router.dart';
 
 class Bullseye {
   late final Router router;
@@ -34,9 +38,16 @@ class Bullseye {
       router.route(HttpMethod.DELETE, path, handler: handler);
   void options(final String path, {final Handler? handler}) =>
       router.route(HttpMethod.OPTIONS, path, handler: handler);
+  void connect(final String path, {final Handler? handler}) =>
+      router.route(HttpMethod.CONNECT, path, handler: handler);
+  void trace(final String path, {final Handler? handler}) =>
+      router.route(HttpMethod.TRACE, path, handler: handler);
+  void head(final String path, {final Handler? handler}) =>
+      router.route(HttpMethod.HEAD, path, handler: handler);
+  void use(Handler middleware) => router.route('*', '*', handler: middleware);
+
   void route(final String method, final String path, {final Handler? handler}) =>
       router.route(method, path, handler: handler);
-  void use(Handler middleware) => router.route('*', '*', handler: middleware);
 
   Router group(final String path) {
     final r = Router(routes: [], groups: [], basePath: path);

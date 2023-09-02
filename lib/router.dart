@@ -38,6 +38,13 @@ class Router {
       route(HttpMethod.DELETE, path, handler: handler);
   void options(final String path, {final Handler? handler}) =>
       route(HttpMethod.OPTIONS, path, handler: handler);
+  void connect(final String path, {final Handler? handler}) =>
+      route(HttpMethod.CONNECT, path, handler: handler);
+  void trace(final String path, {final Handler? handler}) =>
+      route(HttpMethod.TRACE, path, handler: handler);
+  void head(final String path, {final Handler? handler}) =>
+      route(HttpMethod.HEAD, path, handler: handler);
+  void use(Handler middleware) => route('*', '*', handler: middleware);
 
   void route(final String v, final String path, {final Handler? handler}) {
     List<String> segments = [];

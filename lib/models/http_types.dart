@@ -8,7 +8,10 @@ class HttpMethod {
   static String PATCH = 'PATCH';
   static String PUT = 'PUT';
   static String DELETE = 'DELETE';
+  static String HEAD = 'HEAD';
   static String OPTIONS = 'OPTIONS';
+  static String CONNECT = 'CONNECT';
+  static String TRACE = 'TRACE';
 }
 
 typedef Handler = void Function(Context);

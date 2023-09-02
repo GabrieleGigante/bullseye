@@ -1,7 +1,9 @@
 name: bullseye
-description: Express inspired http micro-framework
+description: Gin inspired web framework for Dart.
 version: 1.0.0
 # homepage: https://www.example.com
+repository: https://github.com/GabrieleGigante/bullseye
+
 
 environment:
   sdk: '>=2.19.0 <3.0.0'
