@@ -15,7 +15,7 @@
     <a href="https://github.com/GabrieleGigante/bullseye/tree/main/docs"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/GabrieleGigante/bullseye/tree/main/examples">Examples</a>
+    <a href="https://github.com/GabrieleGigante/bullseye/tree/main/example">Examples</a>
     ·
     <a href="https://github.com/GabrieleGigante/bullseye/issues">Report Bug</a>
     ·
@@ -90,17 +90,17 @@ app.listen();
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Usage examples can be found in the [examples directory](https://github.com/GabrieleGigante/bullseye/tree/main/examples).
+Usage examples can be found in the [example directory](https://github.com/GabrieleGigante/bullseye/tree/main/example).
 To run in development mode:
 
 ```bash
-dart run examples/helloworld.dart
+dart run example/helloworld.dart
 ```
 To run in production mode:
 
 ```bash
-dart compile exe examples/helloworld.dart
-./examples/helloworld.exe
+dart compile exe example/helloworld.dart
+./example/helloworld.exe
 ```
 
 

@@ -6,7 +6,7 @@ repository: https://github.com/GabrieleGigante/bullseye
 
 
 environment:
-  sdk: '>=2.19.0 <3.0.0'
+  sdk: '>=2.19.0 <4.0.0'
 
 dependencies:
   dolumns: ^2.0.0
