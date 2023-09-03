@@ -91,6 +91,18 @@ app.listen();
 ## Usage
 
 Usage examples can be found in the [examples directory](https://github.com/GabrieleGigante/bullseye/tree/main/examples).
+To run in development mode:
+
+```bash
+dart run examples/helloworld.dart
+```
+To run in production mode:
+
+```bash
+dart compile exe examples/helloworld.dart
+./examples/helloworld.exe
+```
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
