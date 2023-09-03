@@ -50,15 +50,14 @@
 
 Add the package to your dependencies:
 
-```bash
-dart pub add bullseye
-```
-<!-- or
-```dart
+<!-- add from github -->
+```yaml
 dependencies:
-  bullseye: latest
+  bullseye: 
+    git:
+      url: https://github.com/GabrieleGigante/bullseye
+      ref: main
 ```
-<br/> -->
 
 Import the package:
 
